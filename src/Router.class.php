@@ -2,6 +2,8 @@
 
 namespace struktal\Router;
 
+use JetBrains\PhpStorm\NoReturn;
+
 class Router {
     private static array $routes = [];
 
@@ -187,7 +189,7 @@ class Router {
 
         if(!($routeFound)) {
             http_response_code(404);
-            Comm::redirect(Router::generate("404"));
+            self::redirect(self::$error404Route);
         }
 
         $route = $foundRoute["route"];
@@ -208,9 +210,9 @@ class Router {
                 if(self::getParameterFromString($paramValue, $paramType) !== null) {
                     $paramValue = self::getParameterFromString($paramValue, $paramType);
                 } else {
-                    Logger::getLogger("Router")->warn("Could not parse parameter \"{$paramName}\" with value \"{$paramValue}\" for route \"{$route}\"");
+                    error_log("Could not parse parameter \"{$paramName}\" with value \"{$paramValue}\" for route \"{$route}\"");
                     http_response_code(400);
-                    Comm::redirect(Router::generate("400"));
+                    self::redirect(self::$error400Route);
                 }
 
                 $_GET[$paramName] = urldecode($paramValue);
@@ -222,9 +224,9 @@ class Router {
             if(file_exists($routeTo)) {
                 include_once($routeTo);
             } else {
-                Logger::getLogger("Router")->error("Could not find file \"{$routeTo}\" for route \"{$route}\"");
+                error_log("Could not find file \"{$routeTo}\" for route \"{$route}\"");
                 http_response_code(404);
-                Comm::redirect(self::generate("404"));
+                self::redirect(self::$error404Route);
             }
         } else {
             if(file_exists($routeTo)) {
@@ -232,9 +234,9 @@ class Router {
                 readfile($routeTo);
                 exit;
             } else {
-                Logger::getLogger("Router")->error("Could not find file \"{$routeTo}\" for route \"{$route}\"");
+                error_log("Could not find file \"{$routeTo}\" for route \"{$route}\"");
                 http_response_code(404);
-                Comm::redirect(self::generate("404"));
+                self::redirect(self::$error404Route);
             }
         }
     }
@@ -253,7 +255,7 @@ class Router {
      * @return string
      */
     public static function staticFilePath(string $path): string {
-        return self::$appBaseUri . "static/" . trim($path, "/");
+        return self::$appBaseUri . self::$staticDirectoryUri . trim($path, "/");
     }
 
     /**
@@ -341,5 +343,16 @@ class Router {
                 return;
             }
         }
+    }
+
+    /**
+     * Redirects the user to the given path
+     * @param string $redirectPath
+     * @return void
+     */
+    #[NoReturn]
+    public static function redirect(string $redirectPath): void {
+        header("Location: " . $redirectPath);
+        exit;
     }
 }
