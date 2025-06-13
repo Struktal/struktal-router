@@ -7,9 +7,12 @@ use JetBrains\PhpStorm\NoReturn;
 class Router {
     private static array $routes = [];
 
-    private static string $pagesDirectory = "";
+    private static string $pagesDirectory = "/";
     private static string $appUrl = "";
-    private static string $appBaseUri = "";
+    private static string $appBaseUri = "/";
+    private static string $staticDirectoryUri = "static/";
+    private static string $error400Route = "";
+    private static string $error404Route = "";
 
     /**
      * Sets the pages directory for the application
@@ -36,6 +39,33 @@ class Router {
      */
     public static function setAppBaseUri(string $appBaseUri): void {
         self::$appBaseUri = rtrim($appBaseUri, "/") . "/";
+    }
+
+    /**
+     * Sets the URI for the static directory
+     * @param string $staticDirectoryUri URI of the static directory
+     * @return void
+     */
+    public static function setStaticDirectoryUri(string $staticDirectoryUri): void {
+        self::$staticDirectoryUri = rtrim($staticDirectoryUri, "/") . "/";
+    }
+
+    /**
+     * Sets the redirect route for 400 errors
+     * @param string $error400Route Redirect route
+     * @return void
+     */
+    public static function setError400Route(string $error400Route): void {
+        self::$error400Route = $error400Route;
+    }
+
+    /**
+     * Sets the redirect route for 404 errors
+     * @param string $error404Route Redirect route
+     * @return void
+     */
+    public static function setError404Route(string $error404Route): void {
+        self::$error404Route = $error404Route;
     }
 
     /**
