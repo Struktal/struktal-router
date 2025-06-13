@@ -14,17 +14,9 @@
     "require": {
         "php": ">=8.2.0"
     },
-    "require-dev": {
-        "pestphp/pest": "~v3.8.2"
-    },
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true
         }
-    },
-    "scripts": {
-        "test": [
-            "vendor/bin/pest"
-        ]
     }
 }
