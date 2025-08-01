@@ -149,18 +149,14 @@ class Router {
     }
 
     /**
-     * Redirects to the file that is registered for the requested route
-     * This method also sets values in the $_GET Array
-     * If no route is found or the file does not exist, the 404 page will be opened
-     * If the required parameters are not valid, the 400 page will be opened
-     * @return void
+     * Returns the cleaned URI of the current request
+     * This method removes the root directory from the URI and removes GET parameters after a question mark
+     * @return string Cleaned URI
      */
-    public function startRouter(): void {
-        $method = $_SERVER["REQUEST_METHOD"];
+    private static function getCleanedUri(): string {
         $uri = $_SERVER["REQUEST_URI"];
 
         // Remove GET parameters after a question mark
-        // GET parameters are set differently
         $uri = explode("?", $uri)[0];
         // Remove the root directory from the URI
         // This is required if the application is not located in the server's root directory
@@ -170,8 +166,18 @@ class Router {
         // Remove leading and trailing slashes
         $uri = trim($uri, "/");
 
-        $foundRoute = [];
-        $routeFound = false;
+        return $uri;
+    }
+
+    /**
+     * Returns the route that was called
+     * @return array|null
+     */
+    public static function getCalledRoute(): array|null {
+        $method = $_SERVER["REQUEST_METHOD"];
+        $uri = self::getCleanedUri();
+
+        $foundRoute = null;
         if(isset(self::$routes[$method])) {
             foreach(self::$routes[$method] as $routeData) {
                 $route = $routeData["route"];
@@ -212,12 +218,25 @@ class Router {
                 if(preg_match("#^" . $regex . "$#i", $uri)) {
                     // The current route matches the request
                     $foundRoute = $routeData;
-                    $routeFound = true;
                 }
             }
         }
 
-        if(!($routeFound)) {
+        return $foundRoute;
+    }
+
+    /**
+     * Redirects to the file that is registered for the requested route
+     * This method also sets values in the $_GET Array
+     * If no route is found or the file does not exist, the 404 page will be opened
+     * If the required parameters are not valid, the 400 page will be opened
+     * @return void
+     */
+    public function startRouter(): void {
+        $foundRoute = self::getCalledRoute();
+        $uri = self::getCleanedUri();
+
+        if($foundRoute === null) {
             http_response_code(404);
             self::redirect(self::$error404Route);
         }
@@ -277,6 +296,18 @@ class Router {
      */
     public static function getCalledURL(): string {
         return self::$appUrl . ltrim($_SERVER["REQUEST_URI"], "/");
+    }
+
+    /**
+     * Returns the name of the route that was called
+     * @return string|null
+     */
+    public static function getCalledRouteName(): string|null {
+        $foundRoute = self::getCalledRoute();
+        if($foundRoute !== null) {
+            return $foundRoute["name"];
+        }
+        return null;
     }
 
     /**
