@@ -259,7 +259,7 @@ class Router {
                 if(self::getParameterFromString($paramValue, $paramType) !== null) {
                     $paramValue = self::getParameterFromString($paramValue, $paramType);
                 } else {
-                    error_log("Could not parse parameter \"{$paramName}\" with value \"{$paramValue}\" for route \"{$route}\"");
+                    trigger_error("Could not parse parameter \"{$paramName}\" with value \"{$paramValue}\" for route \"{$route}\"", E_USER_WARNING);
                     http_response_code(400);
                     self::redirect(self::$error400Route);
                 }
@@ -273,7 +273,7 @@ class Router {
             if(file_exists($routeTo)) {
                 include_once($routeTo);
             } else {
-                error_log("Could not find file \"{$routeTo}\" for route \"{$route}\"");
+                trigger_error("Could not find file \"{$routeTo}\" for route \"{$route}\"", E_USER_WARNING);
                 http_response_code(404);
                 self::redirect(self::$error404Route);
             }
@@ -283,7 +283,7 @@ class Router {
                 readfile($routeTo);
                 exit;
             } else {
-                error_log("Could not find file \"{$routeTo}\" for route \"{$route}\"");
+                trigger_error("Could not find file \"{$routeTo}\" for route \"{$route}\"", E_USER_WARNING);
                 http_response_code(404);
                 self::redirect(self::$error404Route);
             }
