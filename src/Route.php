@@ -91,8 +91,9 @@ class Route {
         }
 
         $parameterValues = [];
-        foreach($this->parameters as $i => $parameter) {
-            $parameterValues[$parameter["name"]] = $groups[$i + 1][0];
+        foreach($this->parameters as $parameterName => $parameterType) {
+            $i = array_search($parameterName, array_keys($this->parameters));
+            $parameterValues[$parameterName] = $groups[$i + 1][0];
         }
         return $parameterValues;
     }
