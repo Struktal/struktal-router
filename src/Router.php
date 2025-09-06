@@ -110,8 +110,13 @@ class Router {
             $uri = substr($uri, strlen(self::$appBaseUri));
         }
 
-        // Remove leading and trailing slashes
+        // Remove trailing slash
         $uri = trim($uri, "/");
+
+        // Add leading slash if not exists
+        if(!str_starts_with($uri, "/")) {
+            $uri = "/" . $uri;
+        }
 
         return $uri;
     }
@@ -192,7 +197,7 @@ class Router {
             return null;
         }
 
-        $routesForMethod = $this->routeRegistry->getRoutes()[$method];
+        $routesForMethod = $this->routeRegistry->getRoutes()[$method]; // TODO: Null-safe
         foreach($routesForMethod as $route) {
             if($route->matches($uri)) {
                 return $route;
